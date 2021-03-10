@@ -1,4 +1,5 @@
 //import express from 'express';
+const Joi = require('joi'); // object ? 
 const express = require('express');
 const app = express();
 
@@ -11,16 +12,16 @@ const toDos = [
 ];
 
 app.get('/', (req, res) => {
-  res.send('This is The KosDo App');
+  return res.send('This is The KosDo App');
 });
 
 // allToDos
 app.get('/api/toDos', (req, res) => {
-  res.send(toDos);
+  return res.send(toDos);
 });
 
 // toDoByID
-app.get('/api/toDos/:toDoID', (req, res) => {
+app.get('/api/toDos/:id', (req, res) => {
   const toDo = toDos.find(smt => smt.id === parseInt(req.params.id)); // ?? smt
   if (!toDo) return res.status(404).send('The ToDo with that ID was not Found'); //404
   return res.send(toDo);
@@ -29,6 +30,16 @@ app.get('/api/toDos/:toDoID', (req, res) => {
 
 //post
 app.post('/api/toDos', (req, res) => {
+  const schema = {
+    name: Joi.string().min(3).required()
+  };
+
+  const result = Joi.validate(req.body, schema);
+  console.log(result);
+
+  if (!req.body.name || req.body.name.length < 3) {
+    return res.status(400).send('Name is required and must be minimum 3 characters')
+  }
   const toDo = {
     id:toDos.length + 1,
     name: req.body.name,
