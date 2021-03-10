@@ -67,6 +67,20 @@ app.put('/api/toDos/:id', (req, res) => {
   res.send(toDo)
 });
 
+
+app.delete('/api/toDos/:id', (req, res) => {
+// check if ID exists and return or 404
+  const toDo = toDos.find(smt => smt.id === parseInt(req.params.id)); // ?? smt
+  if (!toDo) return res.status(404).send('The ToDo with that ID was not Found'); //404 
+  
+  // Delete
+  const index = toDos.indexOf(toDo);
+  toDos.splice(index, 1);
+
+  res.send(toDo);
+});
+
+//validate f
 function validateToDo(toDo) {
   const schema = {
     name: Joi.string().min(3).required()
@@ -80,19 +94,16 @@ app.listen(port, () => console.log(`Listening on Port ${port}!...`));
 
 
 
-
-// put toDos
-// delete toDos / id
-// post toDos : jsn ... create new todo.
-// mkdir database ... separate jSons
-// archived : jSons
-// model controller view ...
-// folder with models
-// folder with controllers
-// function for unique IDs
-// body parse to parse the request 
-// import not require 
-// esm
+//Left to be done:
+// mkdir database ... separate jSons ... feels not ready
+// archived : jSons                  ... did not try
+// model controller view             ... no views .. don't know
+// folder with models                ... no idea
+// folder with controllers           ... not there
+// function for unique IDs           ... should be ok
+// body parse to parse the request  .... maybe ok
+// import not require                ... couldn't get that one going 
+// esm                               ... yeah... did not 
 
 
 
