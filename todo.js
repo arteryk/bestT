@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 
 const toDos = [
-  { id: 1, name: 'ToDo1' , description: 'Simple' },
+  { id: 1, name: 'ToDo 1' , description: 'Simple' },
   { id: 2, name: 'ToDo 2', description: '' },
   { id: 3, name: 'ToDo 3', description: '' },
 ];
@@ -30,16 +30,12 @@ app.get('/api/toDos/:id', (req, res) => {
 
 //post
 app.post('/api/toDos', (req, res) => {
-  const schema = {
-    name: Joi.string().min(3).required()
+  //validate
+  const { error } = validateToDo(req.body);  //result.error
+  if (error) {
+    return res.status(400).send('error.details[0].message');  // ??
   };
 
-  const result = Joi.validate(req.body, schema);
-  console.log(result);
-
-  if (!req.body.name || req.body.name.length < 3) {
-    return res.status(400).send('Name is required and must be minimum 3 characters')
-  }
   const toDo = {
     id:toDos.length + 1,
     name: req.body.name,
@@ -52,9 +48,32 @@ app.post('/api/toDos', (req, res) => {
 // /api/posts/1
 app.get('/api/posts/ID', (req, res) => {
   if (res.body.id !== ID) return res.send('No ToDo Available with that ID');  // ??
-  res.send(req.query);
+  return res.send(req.query);
 });
 
+// update Put
+app.put('/api/toDos/:id', (req, res) => {
+  // check if ID exists and return or 404
+  const toDo = toDos.find(smt => smt.id === parseInt(req.params.id)); // ?? smt
+  if (!toDo) return res.status(404).send('The ToDo with that ID was not Found'); //404  
+  
+  //validate
+  const { error } = validateToDo(req.body);  //result.error
+  if (error) {
+    return res.status(400).send(error.details[0].message);  // ??
+  };
+ 
+  toDo.name = req.body.name;
+  res.send(toDo)
+});
+
+function validateToDo(toDo) {
+  const schema = {
+    name: Joi.string().min(3).required()
+  };
+
+  return Joi.validate(toDo, schema);
+}
 // PORT Listener
 const port = process.env.PORT || 3000
 app.listen(port, () => console.log(`Listening on Port ${port}!...`));
